@@ -10,15 +10,15 @@ import {
     getIdTokenResult
 } from "firebase/auth";
 import {
-    getFirestore, collection, onSnapshot,
-    getDoc, getDocs, addDoc, setDoc, deleteDoc, doc,
+    getFirestore, collection,
+    getDoc, getDocs, addDoc, setDoc, doc,
     query, where,
     orderBy, serverTimestamp, Timestamp,
     updateDoc,
     getCountFromServer,
-    documentId
 } from 'firebase/firestore'
-import { clear } from "console";
+
+
 
 const store = createStore({
     state: {
@@ -71,7 +71,7 @@ const store = createStore({
             state.parkingSpots.push(spot)
         },
         sortParkingSpots(state) {
-            state.parkingSpots.sort((a: any, b: any) => {
+            state.parkingSpots.sort((a, b) => {
                 const idA = parseInt(a.id);
                 const idB = parseInt(b.id);
 
@@ -173,7 +173,7 @@ const store = createStore({
                 }
                 const random = Math.floor(Math.random() * freeSpotsSnapshot.data().count); // get random number from 0 to free spots count-1
 
-                await getDocs(freeSpotsQuery).then((snapshot): void => {
+                await getDocs(freeSpotsQuery).then(() => {
                     updateDoc(doc(db, "parking", (random + 1).toString()), {
                         status: "occupied",
                         carPlate: carPlate,
@@ -203,7 +203,7 @@ const store = createStore({
                     throw new Error('Couldn\'t complete reservation - server error (user update)')
                 });
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during reservation:' + error.message);
                 return { error: error.message }
             }
@@ -233,7 +233,7 @@ const store = createStore({
                         });
                     })
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during getting reservations:' + error.message);
                 return { error: error.message }
             }
@@ -263,7 +263,7 @@ const store = createStore({
                         });
                     })
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during getting reservation:' + error.message);
                 return { error: error.message }
             }
@@ -284,7 +284,7 @@ const store = createStore({
                     })
                 }
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during getting reservation:' + error.message);
                 return { error: error.message }
             }
@@ -321,7 +321,7 @@ const store = createStore({
                     balance: this.state.userBalance - cost
                 })
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during ending reservation:' + error.message);
                 return { error: error.message }
             }
@@ -334,7 +334,7 @@ const store = createStore({
                     balance: this.state.userBalance + amount
                 })
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during adding balance:' + error.message);
                 return { error: error.message }
             }
@@ -364,7 +364,7 @@ const store = createStore({
                     })
                 context.commit('sortParkingSpots')
                 return { success: true }
-            } catch (error: any) {
+            } catch (error) {
                 console.error('Error during getting parking spots:' + error.message);
                 return { error: error.message }
             }

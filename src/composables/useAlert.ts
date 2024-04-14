@@ -2,7 +2,7 @@ import { ref } from 'vue';
 
 export function useAlert() {
   const alertVisible = ref(false);
-  const alertType = ref("");
+  const alertType = ref<"success" | "error" | undefined>(undefined);
   const alertMessage = ref('');
 
   const showAlert = (type: "success" | "error", message: string) => {

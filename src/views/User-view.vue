@@ -1,5 +1,5 @@
 <template>
-  <AppBar v-if="!alertVisible"/>
+  <Appbar v-if="!alertVisible"/>
   
   <div class="user-view bg-grey-lighten-2">
     <v-container fluid style="height: 100%">
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import AppBar from "@/components/AppBar.vue";
+import Appbar from "@/components/Appbar.vue";
 import Reservation from "@/components/Reservation.vue";
 import ReservationHistory from "@/components/ReservationHistory.vue";
 import ActiveReservation from "@/components/ActiveReservation.vue";
@@ -41,7 +41,7 @@ import { getFirestore, onSnapshot, doc } from "firebase/firestore";
 import { useAlert } from '@/composables/useAlert';
 export default {
   components: {
-    AppBar,
+    Appbar,
     ActiveReservation,
     Reservation,
     ReservationHistory,

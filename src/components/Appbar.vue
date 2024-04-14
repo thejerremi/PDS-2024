@@ -58,7 +58,7 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 export default {
-  name: "AppBar",
+  name: "Appbar",
   setup(){
     const store = useStore();
     const router = useRouter();
