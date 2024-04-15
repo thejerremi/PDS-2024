@@ -19,7 +19,7 @@
       <v-pagination class="mt-6" :length="5" v-model="currentPage"></v-pagination>
 
     </div>
-    <v-card class="ma-6" width="37%">
+    <v-card class="ma-6" width="37%" v-if="rectanglesLoaded">
       <v-card-title class="text-h4 text-center">Statystyki parkingu</v-card-title>
       <v-card-text class="text-h4 text-center mt-12">Ilość zajętych miejsc:</v-card-text>
       <v-card-text class="text-h5 text-center">{{ occupiedSpots }}/50</v-card-text>
@@ -49,6 +49,7 @@ export default {
     onMounted(() => {
       const db = getFirestore();
       unsub.value = onSnapshot(collection(db, "parking"), (snapshot) => {
+        store.dispatch('getReservationCountByDate');
         store.dispatch('getParkingSpots')
         setTimeout(() => {
         updateRectangles(currentPage.value);
@@ -57,20 +58,22 @@ export default {
       setTimeout(() => {
         rectanglesLoaded.value = true;
         updateRectangles(1);
+        
       }, 1500);
-      store.dispatch('getReservationCountByDate');
-      console.log(weeklyHistory.value)   
     });
     onBeforeUnmount(() => {
       unsub.value();
     });
 
+    const weeklyHistory = ref(toRaw(store.state.weeklyReservationHistory))
+
+    watch(() => store.state.weeklyReservationHistory, () => {
+      weeklyHistory.value = toRaw(store.state.weeklyReservationHistory);
+    });
 
     const detailsVisible = ref(false);
     const spotId = ref(-1);
-    const occupiedSpots = ref(0);
-
-    const weeklyHistory = computed(() => toRaw(store.state.weeklyReservationHistory))
+    const occupiedSpots = ref(0); 
   
     const parkingSpots = computed(() => store.state.parkingSpots);
     const rectangles = ref([
@@ -123,7 +126,7 @@ export default {
       detailsVisible,
       spotId,
       occupiedSpots,
-      weeklyHistory,
+      weeklyHistory
       
     };
   },
