@@ -43,7 +43,7 @@ const store = createStore({
         weeklyReservationHistory: [],
         showTosOverlay: false,
         showPPOverlay: false,
-        showCookiesBanner: true,
+        showCookiesBanner: localStorage.getItem('showCookiesBanner') !== 'false'
     },
     mutations: {
         //firebase auth
@@ -104,9 +104,9 @@ const store = createStore({
         setShowPPOverlay(state) {
             state.showPPOverlay = !state.showPPOverlay
         },
-        setShowCookiesBanner(state) {
-            state.showCookiesBanner = !state.showCookiesBanner
-        }
+        HIDE_COOKIES_BANNER(state) {
+            state.showCookiesBanner = false;
+          }
     },
     actions: {
         showTosOverlay(context) {
@@ -115,9 +115,9 @@ const store = createStore({
         showPPOverlay(context) {
             context.commit('setShowPPOverlay')
         },
-        showCookiesBanner(context) {
-            context.commit('setShowCookiesBanner')
-        },
+        hideCookiesBanner({ commit }) {
+            commit('HIDE_COOKIES_BANNER');
+          },
         //firebase auth
         async signup(context, { email, password }) {
             const db = getFirestore()
@@ -463,6 +463,10 @@ const store = createStore({
               }
         }
     },
+    getters: {
+        showCookiesBanner: state => state.showCookiesBanner
+      }
+    
 })
 // firebase auth state change
 const unsub = onAuthStateChanged(auth, (user) => {
