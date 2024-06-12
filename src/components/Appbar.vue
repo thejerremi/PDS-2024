@@ -2,6 +2,7 @@
   <v-toolbar :elevation="8" app>
     <v-toolbar-title class="logo">Parking+</v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-btn text href="https://maps.app.goo.gl/vyX3w8KbK2Qnea99A" target="_blank">Lokalizacja</v-btn>
     <div v-if="userActiveReservation === true" class="pr-6">Masz aktywną rezerwację.</div>
     <v-dialog
           transition="dialog-top-transition"

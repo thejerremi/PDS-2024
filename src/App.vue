@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <router-view/>
+    <CookieBanner />
   </v-app>
 </template>
 
@@ -8,31 +9,31 @@
 import { watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from "vuex";
+import CookieBanner from './components/CookieBanner.vue'
 
 export default {
+  components: {
+    CookieBanner
+  },
   setup() {
     const router = useRouter();
     const store = useStore();
     let redirecting = false;
 
 router.beforeEach((to, from, next) => {
-  // Sprawdzamy, czy już nie jesteśmy w trakcie przekierowania
   if (redirecting) {
     next();
     return;
   }
 
-  // Jeśli próbujemy zmienić stronę na ścieżkę /qr/{reservationId}
-  // to zezwól na zmianę strony, niezależnie od roli użytkownika
-  if (to.path.startsWith('/qr/')) {
+  if (to.path.startsWith('/qr/') || to.path.startsWith('/aboutus')) {
     next();
   } else {
-    // W innym przypadku wykonaj swoją logikę na podstawie roli użytkownika
     switch (store.state.userRole) {
       case 'admin':
         console.log('Redirecting to admin panel');
-        redirecting = true; // Ustawiamy flagę, żeby uniknąć ponownego przekierowania
-        router.push('/admin').catch(() => {}); // catch() ignoruje błędy nawigacji
+        redirecting = true; 
+        router.push('/admin').catch(() => {}); 
         break;
       case 'user':
         console.log('Redirecting to user panel');
@@ -40,8 +41,6 @@ router.beforeEach((to, from, next) => {
         router.push('/user').catch(() => {});
         break;
       case 'visitor':
-        // Jeśli użytkownik jest gościem, pozwól mu na dostęp do innych stron, jeśli jest zalogowany
-        // Tutaj możesz dodać dodatkową logikę, jeśli to konieczne
         next();
         break;
       default:

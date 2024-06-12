@@ -7,7 +7,9 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    getIdTokenResult
+    getIdTokenResult,
+    signInWithPopup, 
+    GoogleAuthProvider
 } from "firebase/auth";
 import {
     getFirestore, collection,
@@ -38,7 +40,10 @@ const store = createStore({
         },
         userReservationHistory: [],
         parkingSpots: [],
-        weeklyReservationHistory: []
+        weeklyReservationHistory: [],
+        showTosOverlay: false,
+        showPPOverlay: false,
+        showCookiesBanner: true,
     },
     mutations: {
         //firebase auth
@@ -92,9 +97,27 @@ const store = createStore({
         },
         clearWeeklyHistory(state) {
             state.weeklyReservationHistory.length = 0
+        },
+        setShowTosOverlay(state) {
+            state.showTosOverlay = !state.showTosOverlay
+        },
+        setShowPPOverlay(state) {
+            state.showPPOverlay = !state.showPPOverlay
+        },
+        setShowCookiesBanner(state) {
+            state.showCookiesBanner = !state.showCookiesBanner
         }
     },
     actions: {
+        showTosOverlay(context) {
+            context.commit('setShowTosOverlay')
+        },
+        showPPOverlay(context) {
+            context.commit('setShowPPOverlay')
+        },
+        showCookiesBanner(context) {
+            context.commit('setShowCookiesBanner')
+        },
         //firebase auth
         async signup(context, { email, password }) {
             const db = getFirestore()
@@ -115,6 +138,43 @@ const store = createStore({
                 });
             } else {
                 throw new Error('couldn\'t complete signup')
+            }
+        },
+        async signupWithGoogle(context) {
+            const provider = new GoogleAuthProvider();
+            const response = await signInWithPopup(auth, provider);
+            if (response) {
+                context.commit('setUser', response.user);
+                context.commit('setUserRole', 'user');
+                context.commit('setUserActiveReservation', false)
+                context.commit('setUserBalance', 0)
+                const db = getFirestore()
+                // add user to users collection
+                await setDoc(doc(db, "users", response.user.uid), {
+                    email: response.user.email,
+                    carPlate: "",
+                    activeReservation: false,
+                    balance: 0,
+                });
+            } else {
+                throw new Error('couldn\'t complete signup')
+            }
+        },
+        async loginWithGoogle(context) {
+            const provider = new GoogleAuthProvider();
+            const response = await signInWithPopup(auth, provider);
+            if (response) {
+                const tokenResult = await getIdTokenResult(response.user);
+                context.commit('setUser', response.user);
+                context.commit('setUserRole', tokenResult.claims.admin ? 'admin' : 'user');
+                const userRef = doc(getFirestore(), "users", response.user.uid)
+                const userSnap = await getDoc(userRef)
+                if (userSnap.exists()) {
+                    context.commit('setUserActiveReservation', userSnap.data().activeReservation)
+                    context.commit('setUserBalance', userSnap.data().balance)
+                }
+            } else {
+                throw new Error('couldn\'t complete login')
             }
         },
         async login(context, { email, password }) {
